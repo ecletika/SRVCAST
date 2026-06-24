@@ -1,0 +1,14 @@
+[Unit]
+Description=HotelCast NAT sync
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/hotelcast-gateway
+EnvironmentFile=/etc/hotelcast-gateway.env
+ExecStart=/opt/hotelcast-gateway/.venv/bin/python /opt/hotelcast-gateway/gateway/nat_sync.py
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
