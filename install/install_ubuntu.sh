@@ -4,8 +4,17 @@ APP_DIR=${APP_DIR:-/opt/hotelcast-gateway}
 ENV_FILE=${ENV_FILE:-/etc/hotelcast-gateway.env}
 SRC_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 if [[ $EUID -ne 0 ]]; then echo "Rode com sudo" >&2; exit 1; fi
+
 apt-get update
-apt-get install -y docker.io docker-compose-plugin python3-venv python3-pip nftables iproute2 curl jq openssl rsync
+
+# Ubuntu 24.04: use the Ubuntu docker.io + docker-compose-v2 packages together.
+# Do not mix docker.io with Docker CE's docker-compose-plugin/containerd.io packages,
+# because that can trigger: containerd.io Conflicts: containerd.
+apt-get install -y python3-venv python3-pip nftables iproute2 curl jq openssl rsync
+if ! command -v docker >/dev/null 2>&1 || ! docker compose version >/dev/null 2>&1; then
+  apt-get install -y docker.io docker-compose-v2
+fi
+
 systemctl enable --now docker nftables
 mkdir -p "$APP_DIR" "$APP_DIR/data"
 rsync -a --delete --exclude .venv --exclude data "$SRC_DIR/" "$APP_DIR/"
