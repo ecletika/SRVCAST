@@ -1,0 +1,15 @@
+[Unit]
+Description=HotelCast firewall sync
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/hotelcast-gateway
+EnvironmentFile=/etc/hotelcast-gateway.env
+ExecStart=/opt/hotelcast-gateway/.venv/bin/python /opt/hotelcast-gateway/gateway/firewall_sync.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
